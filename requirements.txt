@@ -1,0 +1,7 @@
+networkx==3.0
+torch_geometric==2.5.3
+torch==2.2.0
+torchvision==0.15.2+cu118
+pydantic==1.9.2
+more_itertools==10.6.0
+ruff==0.9.10
