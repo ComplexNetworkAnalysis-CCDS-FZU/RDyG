@@ -18,17 +18,17 @@ class Data(BaseModel):
 
     @computed_field
     @cached_property
-    def num_interactive(self)->int:
+    def num_interactive(self) -> int:
         return len(self.src_node_ids)
 
     @computed_field
     @cached_property
-    def unique_node_ids(self)->Set[int]:
+    def unique_node_ids(self) -> Set[int]:
         return set(self.src_node_ids) | set(self.dst_node_ids)
 
     @computed_field
     @cached_property
-    def num_unique_nodes(self)->int:
+    def num_unique_nodes(self) -> int:
         return len(self.unique_node_ids)
 
     @staticmethod
@@ -49,7 +49,8 @@ class Data(BaseModel):
         return data
 
     class Config:
-        arbitrary_types_allowed=True
+        arbitrary_types_allowed = True
+
 
 class SplitEventStream(EventStream):
     def __init__(self, event_list: List[Event]):
@@ -115,4 +116,4 @@ class Batchtifier(
         if index == 0:
             return Data.from_batch_container(BatchContainer(self.intro))
         else:
-            return  Data.from_batch_container(self.inner_iter[index - 1])
+            return Data.from_batch_container(self.inner_iter[index - 1])

@@ -1,10 +1,6 @@
 import abc
-from typing import Generic, List, TypeVar
+from typing import List
 
-from more_itertools import chunked, take
-import torch
-import torch.utils
-import torch.utils.data
 
 from src.payload.event import Event
 
@@ -40,5 +36,3 @@ class BatchContainer:
     @property
     def event(self):
         return self._events
-
-
