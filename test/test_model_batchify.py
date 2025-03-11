@@ -1,7 +1,9 @@
 import unittest
 
-from src.model.batchtifier import Batchtifier, EventStream
+
+from src.model.batchtifier import EventStream
 from src.payload.event import Event
+from src.utils.dataloader import Batchtifier
 
 
 class TestEvenStream(EventStream):
