@@ -1,10 +1,10 @@
 import unittest
 
-from src.model.batchtifier import Batchtifier, EvenStream
+from src.model.batchtifier import Batchtifier, EventStream
 from src.payload.event import Event
 
 
-class TestEvenStream(EvenStream):
+class TestEvenStream(EventStream):
     def __init__(self, *events: Event):
         super().__init__()
         self.events = events

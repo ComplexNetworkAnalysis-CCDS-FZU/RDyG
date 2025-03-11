@@ -15,3 +15,5 @@ class Event(BaseModel, Generic[T]):
     dst_node: T
     ty: EventKind = Field(EventKind.ADD)
     timestamp: Optional[int] = Field(None)
+    event_id: Optional[int] = Field(0)
+    label: Optional[int] = Field(None)

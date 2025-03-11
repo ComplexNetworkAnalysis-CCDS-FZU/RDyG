@@ -7,7 +7,7 @@ import torch
 from src.payload.event import Event
 
 
-class EvenStream(abc.ABC):
+class EventStream(abc.ABC):
     """实现的能获得消息流的事件流"""
 
     @abc.abstractmethod
@@ -57,8 +57,12 @@ class BatchContainer:
 
         return interactive_matrix, src_node_mapping, dst_node_mapping
 
+    @property
+    def event(self):
+        return self._events
 
-ES = TypeVar("ES", bound=EvenStream)
+
+ES = TypeVar("ES", bound=EventStream)
 
 
 class Batchtifier(Generic[ES]):
