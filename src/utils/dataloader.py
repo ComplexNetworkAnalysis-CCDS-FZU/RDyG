@@ -1,6 +1,5 @@
-import abc
 from functools import cached_property
-from typing import List, Tuple, Union
+from typing import List
 import numpy as np
 from pydantic import BaseModel, computed_field
 
@@ -60,7 +59,7 @@ class SplitEventStream(EventStream):
     def __next__(self) -> Event:
         if self.idx <= len(self.payload):
             data = self.payload[self.idx]
-            idx += 1
+            self.idx += 1
             return data
         else:
             raise StopIteration
