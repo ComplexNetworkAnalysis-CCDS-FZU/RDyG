@@ -4,7 +4,7 @@ import abc
 from typing import Generic, List, TypeVar
 from torch.utils.data import Dataset
 
-from src.model.batchtifier import EventStream
+from src.payload.event_stream import EventStream
 from src.payload.event import Event
 from src.utils.dataloader import Data
 

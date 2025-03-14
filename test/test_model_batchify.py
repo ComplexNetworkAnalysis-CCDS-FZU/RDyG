@@ -3,7 +3,7 @@ import unittest
 from sympy import im
 
 
-from src.model.batchtifier import EventStream
+from src.payload.event_stream import EventStream
 from src.payload.event import Event
 from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier as Batchtifier
 

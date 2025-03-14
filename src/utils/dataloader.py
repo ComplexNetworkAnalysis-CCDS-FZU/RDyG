@@ -5,7 +5,7 @@ import numpy as np
 from pydantic import BaseModel, computed_field
 import torch
 
-from src.model.batchtifier import EventStream
+from src.payload.event_stream import EventStream
 from src.payload.event import Event
 
 class Data(BaseModel):
