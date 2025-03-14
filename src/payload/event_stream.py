@@ -1,11 +1,11 @@
 import abc
-from typing import List
+from typing import Iterable, List
 
 
 from src.payload.event import Event
 
 
-class EventStream(abc.ABC):
+class EventStream(abc.ABC,Iterable[Event]):
     """实现的能获得消息流的事件流"""
 
     @abc.abstractmethod
