@@ -5,9 +5,8 @@ import numpy as np
 from pydantic import BaseModel, computed_field
 import torch
 
-from src.model.batchtifier import BatchContainer, EventStream
+from src.model.batchtifier import EventStream
 from src.payload.event import Event
-
 
 class Data(BaseModel):
     src_node_ids: np.ndarray
@@ -32,11 +31,11 @@ class Data(BaseModel):
         return len(self.unique_node_ids)
 
     @staticmethod
-    def from_batch_container(event: BatchContainer):
+    def from_batch(event: List[Event]):
         src, dst, timestamp, edge_id, label = zip(
             [
                 (e.src_node, e.dst_node, e.timestamp, e.event_id, e.label)
-                for e in event.event
+                for e in event
             ]
         )
         data = Data(
@@ -47,6 +46,7 @@ class Data(BaseModel):
             label=np.array(label, dtype=np.int64),
         )
         return data
+    
 
     class Config:
         arbitrary_types_allowed = True
@@ -83,37 +83,4 @@ class SplitEventStream(EventStream):
 ES = TypeVar("ES", bound=EventStream)
 
 
-class Batchtifier(
-    torch.utils.data.Dataset,
-    Generic[ES],
-):
-    def __init__(self, event_stream: ES, batch_size: int = 100):
-        self.intro = []
-        self.provide_intro = False
 
-        if len(event_stream) % batch_size != 0:
-            self.intro = take(len(event_stream) % batch_size, event_stream)
-            self.provide_intro = True
-
-        self.inner_iter = list(chunked(event_stream, batch_size))
-        self.idx = 0
-
-    def __next__(self) -> BatchContainer:
-        if self.provide_intro:
-            self.provide_intro = False
-            return self.intro
-        elif self.idx < len(self.inner_iter):
-            data = BatchContainer(self.inner_iter[self.idx])
-            self.idx += 1
-            return data
-        else:
-            raise StopIteration
-
-    def __iter__(self):
-        return self
-
-    def __getitem__(self, index):
-        if index == 0:
-            return Data.from_batch_container(BatchContainer(self.intro))
-        else:
-            return Data.from_batch_container(self.inner_iter[index - 1])

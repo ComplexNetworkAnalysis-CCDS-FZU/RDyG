@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Generic, Optional, TypeVar
 from pydantic import BaseModel, Field
 
-T = TypeVar("T", str, int)
 
 
 class EventKind(Enum):
@@ -10,9 +9,9 @@ class EventKind(Enum):
     REMOVE = 2
 
 
-class Event(BaseModel, Generic[T]):
-    src_node: T
-    dst_node: T
+class Event(BaseModel):
+    src_node: int
+    dst_node: int
     ty: EventKind = Field(EventKind.ADD)
     timestamp: Optional[int] = Field(None)
     event_id: Optional[int] = Field(0)

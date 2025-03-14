@@ -19,20 +19,3 @@ class EventStream(abc.ABC):
     def __iter__(self):
         return self
 
-
-class BatchContainer:
-    def __init__(self, batch: List[Event]):
-        self._events = batch
-
-    def __len__(self):
-        return len(self._events)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        return self._events.__next__()
-
-    @property
-    def event(self):
-        return self._events
