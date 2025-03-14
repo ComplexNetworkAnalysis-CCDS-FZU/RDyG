@@ -1,11 +1,11 @@
 import unittest
 
-from sympy import im
-
 
 from src.payload.event_stream import EventStream
 from src.payload.event import Event
-from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier as Batchtifier
+from src.utils.batchtifier.global_event_batch import (
+    GlobalEventBatchtifier as Batchtifier,
+)
 
 
 class TestEvenStream(EventStream):
@@ -29,7 +29,10 @@ class TestBatchtify(unittest.TestCase):
     def test_full_batch(self):
         batch = Batchtifier[TestEvenStream](
             TestEvenStream(
-                Event(src_node=1, dst_node=2,),
+                Event(
+                    src_node=1,
+                    dst_node=2,
+                ),
                 Event(src_node=2, dst_node=3),
                 Event(src_node=3, dst_node=1),
                 Event(src_node=4, dst_node=2),

@@ -1,3 +1,3 @@
-__all__ = ["dataloader","batchtifier"]
+__all__ = ["dataloader", "batchtifier"]
 from . import dataloader
 from . import batchtifier

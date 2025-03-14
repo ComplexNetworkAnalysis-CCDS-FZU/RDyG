@@ -1,12 +1,11 @@
 from functools import cached_property
-from typing import Generic, List, Set, TypeVar
-from more_itertools import chunked, take
+from typing import List, Set, TypeVar
 import numpy as np
 from pydantic import BaseModel, computed_field
-import torch
 
 from src.payload.event_stream import EventStream
 from src.payload.event import Event
+
 
 class Data(BaseModel):
     src_node_ids: np.ndarray
@@ -33,10 +32,7 @@ class Data(BaseModel):
     @staticmethod
     def from_batch(event: List[Event]):
         src, dst, timestamp, edge_id, label = zip(
-            [
-                (e.src_node, e.dst_node, e.timestamp, e.event_id, e.label)
-                for e in event
-            ]
+            [(e.src_node, e.dst_node, e.timestamp, e.event_id, e.label) for e in event]
         )
         data = Data(
             src_node_ids=np.array(src, dtype=np.longlong),
@@ -46,7 +42,6 @@ class Data(BaseModel):
             label=np.array(label, dtype=np.int64),
         )
         return data
-    
 
     class Config:
         arbitrary_types_allowed = True
@@ -81,6 +76,3 @@ class SplitEventStream(EventStream):
 
 
 ES = TypeVar("ES", bound=EventStream)
-
-
-
