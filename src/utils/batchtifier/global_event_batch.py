@@ -25,19 +25,19 @@ class GlobalEventBatchtifier(BaseBatchtifier, Generic[ES]):
         self.inner_iter: List[List[Event]] = list(chunked(event_stream, batch_size))
         self.idx = 0
 
-    def __next__(self) -> Dict[str, List[Event]]:
+    def __next__(self) -> List[Event]:
         if self.provide_intro:
             self.provide_intro = False
-            return {"base": self.intro}
+            return self.intro
         elif self.idx < len(self.inner_iter):
             data = self.inner_iter[self.idx]
             self.idx += 1
-            return {"base": data}
+            return data
         else:
             raise StopIteration
 
     def __getitem__(self, index):
         if index == 0:
-            return {"base": self.intro}
+            return self.intro
         else:
-            return {"base": self.inner_iter[index - 1]}
+            return self.inner_iter[index - 1]

@@ -1,5 +1,5 @@
-__all__ = ["global_event_batch"]
-from . import global_event_batch
+
+
 import abc
 from typing import Dict, Generic, List, TypeVar
 from torch.utils.data import Dataset
@@ -19,14 +19,14 @@ class BaseBatchtifier(abc.ABC, Generic[ES]):
         self.event_stream = event_stream
 
     @abc.abstractmethod
-    def __next__(self) -> Dict[str, List[Event]]:
+    def __next__(self) -> List[Event]:
         pass
 
     def __iter__(self):
         return self
 
     @abc.abstractmethod
-    def __getitem__(self, index) -> Dict[str, List[Event]]:
+    def __getitem__(self, index) -> List[Event]:
         pass
 
 
@@ -34,8 +34,5 @@ class BatchedDataset(Dataset, Generic[ES]):
     def __init__(self, batchtifier: BaseBatchtifier[ES]):
         self.batchtifier = batchtifier
 
-    def __getitem__(self, index) -> Dict[str, Data]:
-        return {
-            name: Data.from_batch(value)
-            for name, value in self.batchtifier[index].items()
-        }
+    def __getitem__(self, index) -> Data:
+        return Data.from_batch(self.batchtifier[index])
