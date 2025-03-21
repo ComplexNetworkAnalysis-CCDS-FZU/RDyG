@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 from pydantic import BaseModel, Field
 
 
@@ -17,5 +17,15 @@ class Event(BaseModel):
     label: Optional[int] = Field(None)
 
     @classmethod
-    def from_list(cls,*data:Tuple[int,int]):
-        return [cls(src_node=d[0],dst_node=d[1],ty=EventKind.ADD,timestamp=None,event_id=None,label=None) for d in data]
+    def from_list(cls, *data: Tuple[int, int]):
+        return [
+            cls(
+                src_node=d[0],
+                dst_node=d[1],
+                ty=EventKind.ADD,
+                timestamp=None,
+                event_id=None,
+                label=None,
+            )
+            for d in data
+        ]

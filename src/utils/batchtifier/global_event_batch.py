@@ -1,4 +1,4 @@
-from typing import Dict, Generic, List
+from typing import Generic, List
 
 from more_itertools import chunked, take
 from src.payload.event import Event
