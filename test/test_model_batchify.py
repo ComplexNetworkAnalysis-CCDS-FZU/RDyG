@@ -1,3 +1,4 @@
+from typing import List
 import unittest
 
 
@@ -23,19 +24,20 @@ class TestEvenStream(EventStream):
 
     def __len__(self):
         return len(self.events)
+    
+    @classmethod
+    def load(cls,payload:List[dict]):
+        pass
 
 
-class TestBatchtify(unittest.TestCase):
+class TestBatchtifier(unittest.TestCase):
+    
     def test_full_batch(self):
         batch = Batchtifier[TestEvenStream](
             TestEvenStream(
-                Event(
-                    src_node=1,
-                    dst_node=2,
-                ),
-                Event(src_node=2, dst_node=3),
-                Event(src_node=3, dst_node=1),
-                Event(src_node=4, dst_node=2),
+                *Event.from_list(
+                    (1,2),(2,3),(3,1),(4,2)
+                )
             ),
             batch_size=2,
         )
@@ -55,9 +57,9 @@ class TestBatchtify(unittest.TestCase):
         """如果事件流不能刚好被划分为指定长度的批次，第一个批次将较短"""
         batch = Batchtifier[TestEvenStream](
             TestEvenStream(
-                Event(src_node=1, dst_node=2),
-                Event(src_node=2, dst_node=3),
-                Event(src_node=3, dst_node=1),
+                *Event.from_list(
+                    (1,2),(2,3),(3,1)
+                )
             ),
             batch_size=2,
         )
@@ -76,9 +78,9 @@ class TestBatchtify(unittest.TestCase):
     def test_item_not_enough(self):
         batch = Batchtifier[TestEvenStream](
             TestEvenStream(
-                Event(src_node=1, dst_node=2),
-                Event(src_node=2, dst_node=3),
-                Event(src_node=3, dst_node=1),
+                *Event.from_list(
+                    (1,2),(2,3),(3,1)
+                )
             ),
             batch_size=20,
         )
