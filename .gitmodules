@@ -1,0 +1,3 @@
+[submodule "DyGLib"]
+	path = DyGLib
+	url = git@github.com:ComplexNetworkAnalysis-CCDS-FZU/DyGLib.git

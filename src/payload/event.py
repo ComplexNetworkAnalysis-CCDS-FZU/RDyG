@@ -29,3 +29,9 @@ class Event(BaseModel):
             )
             for d in data
         ]
+        
+    def __hash__(self) -> int:
+        return self.src_node.__hash__() + self.dst_node.__hash__() + self.ty.__hash__() + self.timestamp.__hash__() + self.event_id.__hash__() + self.label.__hash__()
+    
+    def __eq__(self, value) -> bool:
+        return self.src_node == value.src_node and self.dst_node ==value.dst_node and self.timestamp == value.timestamp and self.event_id == value.event_id and self.label == value.label and self.ty == value .ty
