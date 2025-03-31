@@ -1,11 +1,9 @@
-
-from typing import List
 import unittest
 
 from src.payload.event import Event
 from src.payload.event_stream import EventStream
-from src.utils import batchtifier
 from src.utils.batchtifier.node_wish_event_batch import NodeWishEventBatchtifier
+
 
 class TestEvenStream(EventStream):
     def __init__(self, *events: Event):
@@ -25,26 +23,19 @@ class TestEvenStream(EventStream):
 
 
 class TestNodeWishBatcher(unittest.TestCase):
-    
     def test_no_align_batch(self):
         event_stream = TestEvenStream(
-            *Event.from_list(
-                (1,2),(1,3),(2,3),
-                (1,4),(2,4),(1,2)
-            )
+            *Event.from_list((1, 2), (1, 3), (2, 3), (1, 4), (2, 4), (1, 2))
         )
-        
-        batchtifier = NodeWishEventBatchtifier[TestEvenStream](event_stream,2)
+
+        batchtifier = NodeWishEventBatchtifier[TestEvenStream](event_stream, 2)
         batch_iter = iter(batchtifier)
-        
+
         batch1 = next(batch_iter)
-        self.assertEqual(6,len(batch1))
-        
+        self.assertEqual(6, len(batch1))
+
         batch2 = next(batch_iter)
-        self.assertEqual(6,len(batch2))
-        
-    
+        self.assertEqual(6, len(batch2))
+
     def test_align_batch(self):
         pass
-    
-    
