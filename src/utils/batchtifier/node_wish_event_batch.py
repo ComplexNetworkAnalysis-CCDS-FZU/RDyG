@@ -57,6 +57,7 @@ class NodeWishEventBatchtifier(BaseBatchtifier, Generic[ES]):
             ] * self.batch_size
             while current_len < target_len:
                 node_event_list.insert(0, padding)
+                current_len += 1
             return node_event_list
 
         # 对齐
@@ -72,11 +73,15 @@ class NodeWishEventBatchtifier(BaseBatchtifier, Generic[ES]):
                 lambda x, y: x + y, [v[self.idx] for v in self.batches.values()], []
             )
             self.idx += 1
-            return data
+            return list(set(data))
         else:
             raise StopIteration
 
     def __getitem__(self, index) -> List[Event]:
-        return reduce(
-            lambda x, y: x + y, [v[self.idx] for v in self.batches.values()], []
+        return list(
+            set(
+                reduce(
+                    lambda x, y: x + y, [v[self.idx] for v in self.batches.values()], []
+                )
+            )
         )
