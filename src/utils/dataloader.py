@@ -32,7 +32,7 @@ class Data(BaseModel):
     @staticmethod
     def from_batch(event: List[Event]):
         src, dst, timestamp, edge_id, label = zip(
-            [(e.src_node, e.dst_node, e.timestamp, e.event_id, e.label) for e in event]
+            [(e.src_node, e.dst_node, e.timestamp, e.event_id, e.label) for e in event if e.src_node !=0 or e.dst_node != 0]
         )
         data = Data(
             src_node_ids=np.array(src, dtype=np.longlong),

@@ -5,3 +5,4 @@ torchvision==0.15.2+cu118
 pydantic==2.10.6
 more_itertools==10.6.0
 ruff==0.9.10
+pydantic-argparse=0.10.0
