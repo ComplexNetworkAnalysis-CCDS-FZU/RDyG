@@ -1,10 +1,11 @@
 from DyGLib.models.DyGFormer import DyGFormer
 from DyGLib.utils.DataLoader import Data
-from DyGLib.utils.utils import get_neighbor_sampler
+from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
 from src.utils.batchtifier import BatchedDataset
 from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier
 from src.utils.dataloader import SplitEventStream
 from torch.utils.data import DataLoader
+
 # TODO： 解决模型初始化参数问题
 node_raw_features = None
 edge_raw_features = None
@@ -26,7 +27,9 @@ train_dataloader = DataLoader(train_dataset)
 test_dataloader = DataLoader(test_dataset)
 
 
-model = DyGFormer(node_raw_features=node_raw_features, edge_raw_features=edge_raw_features, neighbor_sampler=train_neighbor_sampler,
+init_neighbor_sampler = NeighborSampler([])
+
+model = DyGFormer(node_raw_features=node_raw_features, edge_raw_features=edge_raw_features, neighbor_sampler=init_neighbor_sampler,
                                          time_feat_dim=100, channel_embedding_dim=50, patch_size=1,
                                          num_layers=2, num_heads=2, dropout=0.1,
                                          max_input_sequence_length=32, device='cuda')
