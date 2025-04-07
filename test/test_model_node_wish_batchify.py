@@ -38,9 +38,7 @@ class TestNodeWishBatcher(unittest.TestCase):
         self.assertEqual(4, len(batch2))
 
     def test_align_batch(self):
-        event_stream = TestEvenStream(
-            *Event.from_list( (2, 3), (1, 4), (2, 4), (1, 2))
-        )
+        event_stream = TestEvenStream(*Event.from_list((2, 3), (1, 4), (2, 4), (1, 2)))
 
         batchtifier = NodeWishEventBatchtifier[TestEvenStream](event_stream, 2)
         batch_iter = iter(batchtifier)
@@ -49,6 +47,5 @@ class TestNodeWishBatcher(unittest.TestCase):
         print(batch1)
         self.assertEqual(4, len(batch1))
 
-        
         with self.assertRaises(StopIteration):
             next(batch_iter)
