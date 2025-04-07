@@ -22,5 +22,5 @@ class BatchEmbeddingUpdater(nn.Module):
         
         neighbor_embedding_shift = self.neighbor_layer.forward(batch_neighbor_embedding)
         node_embedding = self.node_layer.forward(previous_embedding + neighbor_embedding_shift)
-        return node_embedding
+        return node_embedding + previous_embedding
         
