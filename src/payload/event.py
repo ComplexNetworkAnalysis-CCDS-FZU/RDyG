@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Optional, Tuple, Union
 from pydantic import BaseModel, Field
-from regex import F
 
 
 class EventKind(Enum):
@@ -13,9 +12,9 @@ class Event(BaseModel):
     src_node: int
     dst_node: int
     ty: EventKind = Field(EventKind.ADD)
-    timestamp: Optional[Union[int,float]] = Field(None)
+    timestamp: Optional[Union[int, float]] = Field(None)
     event_id: Optional[int] = Field(0)
-    label: Optional[Union[int,float]] = Field(None)
+    label: Optional[Union[int, float]] = Field(None)
 
     @classmethod
     def from_list(cls, *data: Tuple[int, int]):

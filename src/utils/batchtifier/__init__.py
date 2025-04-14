@@ -1,5 +1,5 @@
 import abc
-from typing import Generic, List, Tuple, TypeVar
+from typing import Generic, List, TypeVar
 from torch.utils.data import Dataset
 
 from src.payload.event_stream import EventStream
