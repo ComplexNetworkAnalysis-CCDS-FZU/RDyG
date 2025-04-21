@@ -1,5 +1,4 @@
 import numpy as np
-from torch import Tensor
 import torch
 from tqdm import tqdm
 from DyGLib.models.DyGFormer import DyGFormer
@@ -86,12 +85,11 @@ model = DyGFormer(
     device="cpu",
 )
 
-r_part_model = BatchEmbeddingUpdater(2,128)
+r_part_model = BatchEmbeddingUpdater(2, 128)
 
 
 for epoch in range(100):
-    
-    embedding = torch.rand([14096,128])
+    embedding = torch.rand([14096, 128])
     for data in tqdm(train_dataloader):
         data = Data(
             src_node_ids=list(data["src_node_ids"]),
@@ -129,8 +127,14 @@ for epoch in range(100):
                 batch_src_node_ids, batch_dst_node_ids, batch_node_interact_times
             )
         )
-        
-        embedding = r_part_model.forward(torch.from_numpy(batch_src_node_ids),torch.from_numpy(batch_dst_node_ids),embedding,batch_src_node_embedding,batch_dsc_node_embedding)
+
+        embedding = r_part_model.forward(
+            torch.from_numpy(batch_src_node_ids),
+            torch.from_numpy(batch_dst_node_ids),
+            embedding,
+            batch_src_node_embedding,
+            batch_dsc_node_embedding,
+        )
 
         # TODO: 接入后续模型部分
         print(embedding)
