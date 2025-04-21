@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import List, Set, TypeVar
+from typing import List, Set, TypeVar, Union
 import numpy as np
 from pydantic import BaseModel, computed_field
 
@@ -8,11 +8,11 @@ from src.payload.event import Event
 
 
 class Data(BaseModel):
-    src_node_ids: np.ndarray
-    dst_node_ids: np.ndarray
-    node_interactive_time: np.ndarray
-    edge_ids: np.ndarray
-    label: np.ndarray
+    src_node_ids: List[int]
+    dst_node_ids: List[int]
+    node_interactive_time: List[float]
+    edge_ids: List[int]
+    label: List[float]
 
     @computed_field
     @cached_property
@@ -32,21 +32,21 @@ class Data(BaseModel):
     @staticmethod
     def from_batch(event: List[Event]):
         src, dst, timestamp, edge_id, label = zip(
-            [
+            *[
                 (e.src_node, e.dst_node, e.timestamp, e.event_id, e.label)
                 for e in event
                 if e.src_node != 0 or e.dst_node != 0
             ]
         )
         data = Data(
-            src_node_ids=np.array(src, dtype=np.longlong),
-            dst_node_ids=np.array(dst, dtype=np.longlong),
-            node_interactive_time=np.array(timestamp, dtype=np.float64),
-            edge_ids=np.array(edge_id, dtype=np.longlong),
-            label=np.array(label, dtype=np.int64),
+            src_node_ids=list(src),
+            dst_node_ids=list(dst),
+            node_interactive_time=list(timestamp),
+            edge_ids=list(edge_id),
+            label=list(label),
         )
         return data
-
+    
     class Config:
         arbitrary_types_allowed = True
 
@@ -61,7 +61,7 @@ class SplitEventStream(EventStream):
         return self
 
     def __next__(self) -> Event:
-        if self.idx <= len(self.payload):
+        if self.idx < len(self.payload):
             data = self.payload[self.idx]
             self.idx += 1
             return data

@@ -1,12 +1,13 @@
 import numpy as np
+from tqdm import tqdm
 from DyGLib.models.DyGFormer import DyGFormer
-from DyGLib.utils.DataLoader import Data
+from DyGLib.utils.DataLoader import Data as DyGData
 from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
 from src.payload.event import Event, EventKind
 from src.payload.event_stream import EventStream
 from src.utils.batchtifier import BatchedDataset
 from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier
-from src.utils.dataloader import SplitEventStream
+from src.utils.dataloader import Data, SplitEventStream
 from torch.utils.data import DataLoader
 
 # TODO： 解决模型初始化参数问题
@@ -79,16 +80,23 @@ model = DyGFormer(
     num_heads=2,
     dropout=0.1,
     max_input_sequence_length=32,
-    device="cuda",
+    device="cpu",
 )
 
 
 for epoch in range(100):
-    for data in train_dataloader:
-        data: Data
+    for data in tqdm(train_dataloader):
+        data = Data(
+            src_node_ids=list(data["src_node_ids"]),
+            dst_node_ids=list(data["dst_node_ids"]),
+            node_interactive_time=list(data["node_interactive_time"]),
+            edge_ids=list(data["edge_ids"]),
+            label=list(data["label"])
+        )
+        data = DyGData(data.src_node_ids,data.dst_node_ids,data.node_interactive_time,data.edge_ids,data.label)
         model.train()
 
-        neighbor_sampler = get_neighbor_sampler(data)
+        neighbor_sampler = get_neighbor_sampler(data,seed=12345)
         model.set_neighbor_sampler(neighbor_sampler)
 
         (
@@ -97,10 +105,10 @@ for epoch in range(100):
             batch_node_interact_times,
             batch_edge_ids,
         ) = (
-            data.src_node_ids,
-            data.dst_node_ids,
-            data.node_interact_times,
-            data.edge_ids,
+            np.asarray(data.src_node_ids),
+            np.asarray(data.dst_node_ids),
+            np.asarray(data.node_interact_times),
+            np.asarray(data.edge_ids),
         )
 
         batch_src_node_embedding, batch_dsc_node_embedding = (
@@ -110,5 +118,5 @@ for epoch in range(100):
         )
 
         # TODO: 接入后续模型部分
-
+        print(batch_src_node_embedding.shape)
         # TODO: 损失函数与梯度下降
