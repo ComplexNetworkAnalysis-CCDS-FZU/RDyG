@@ -1,8 +1,11 @@
 import numpy as np
+from torch import Tensor
+import torch
 from tqdm import tqdm
 from DyGLib.models.DyGFormer import DyGFormer
 from DyGLib.utils.DataLoader import Data as DyGData
 from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
+from src.model.batch_emd_updater import BatchEmbeddingUpdater
 from src.payload.event import Event, EventKind
 from src.payload.event_stream import EventStream
 from src.utils.batchtifier import BatchedDataset
@@ -83,8 +86,12 @@ model = DyGFormer(
     device="cpu",
 )
 
+r_part_model = BatchEmbeddingUpdater(2,128)
+
 
 for epoch in range(100):
+    
+    embedding = torch.rand([14096,128])
     for data in tqdm(train_dataloader):
         data = Data(
             src_node_ids=list(data["src_node_ids"]),
@@ -122,7 +129,11 @@ for epoch in range(100):
                 batch_src_node_ids, batch_dst_node_ids, batch_node_interact_times
             )
         )
+        
+        embedding = r_part_model.forward(torch.from_numpy(batch_src_node_ids),torch.from_numpy(batch_dst_node_ids),embedding,batch_src_node_embedding,batch_dsc_node_embedding)
 
         # TODO: 接入后续模型部分
-        print(batch_src_node_embedding.shape)
+        print(embedding)
         # TODO: 损失函数与梯度下降
+        break
+    break
