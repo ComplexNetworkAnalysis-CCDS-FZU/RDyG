@@ -1,12 +1,10 @@
 import abc
-from typing import Dict, Generic, List, TypeVar, Union
-import numpy as np
+from typing import Dict, Generic, List, TypeVar
 from torch.utils.data import Dataset
 
 from src.payload.event_stream import EventStream
 from src.payload.event import Event
 from src.utils.dataloader import Data
-from DyGLib.utils.utils import Data as DyGData
 
 ES = TypeVar("ES", bound=EventStream)
 
@@ -28,9 +26,9 @@ class BaseBatchtifier(abc.ABC, Generic[ES]):
     @abc.abstractmethod
     def __getitem__(self, index) -> List[Event]:
         pass
-    
+
     @abc.abstractmethod
-    def __len__(self)->int:
+    def __len__(self) -> int:
         pass
 
 
@@ -38,16 +36,15 @@ class BatchedDataset(Dataset, Generic[ES]):
     def __init__(self, batchtifier: BaseBatchtifier[ES]):
         self.batchtifier = batchtifier
 
-    def __getitem__(self, index) -> Dict[str,List]:
+    def __getitem__(self, index) -> Dict[str, List]:
         data = Data.from_batch(self.batchtifier[index])
         return {
-            "src_node_ids":data.src_node_ids,
-           "dst_node_ids": data.dst_node_ids,
-            "node_interactive_time":data.node_interactive_time,
-            "edge_ids":data.edge_ids,
-            "label":data.label,
+            "src_node_ids": data.src_node_ids,
+            "dst_node_ids": data.dst_node_ids,
+            "node_interactive_time": data.node_interactive_time,
+            "edge_ids": data.edge_ids,
+            "label": data.label,
         }
-        
-        
+
     def __len__(self):
         return self.batchtifier.__len__()

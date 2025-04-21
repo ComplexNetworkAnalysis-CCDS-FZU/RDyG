@@ -27,7 +27,7 @@ class MyketDataset(EventStream):
 
     def __next__(self) -> Event:
         if self.idx < self.max_idx:
-            src_node, dst_node, timestamp, label, id,_ = self.lines[self.idx].split(
+            src_node, dst_node, timestamp, label, id, _ = self.lines[self.idx].split(
                 ","
             )
 
@@ -91,12 +91,18 @@ for epoch in range(100):
             dst_node_ids=list(data["dst_node_ids"]),
             node_interactive_time=list(data["node_interactive_time"]),
             edge_ids=list(data["edge_ids"]),
-            label=list(data["label"])
+            label=list(data["label"]),
         )
-        data = DyGData(data.src_node_ids,data.dst_node_ids,data.node_interactive_time,data.edge_ids,data.label)
+        data = DyGData(
+            data.src_node_ids,
+            data.dst_node_ids,
+            data.node_interactive_time,
+            data.edge_ids,
+            data.label,
+        )
         model.train()
 
-        neighbor_sampler = get_neighbor_sampler(data,seed=12345)
+        neighbor_sampler = get_neighbor_sampler(data, seed=12345)
         model.set_neighbor_sampler(neighbor_sampler)
 
         (

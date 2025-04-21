@@ -1,6 +1,5 @@
 from functools import cached_property
-from typing import List, Set, TypeVar, Union
-import numpy as np
+from typing import List, Set, TypeVar
 from pydantic import BaseModel, computed_field
 
 from src.payload.event_stream import EventStream
@@ -46,7 +45,7 @@ class Data(BaseModel):
             label=list(label),
         )
         return data
-    
+
     class Config:
         arbitrary_types_allowed = True
 

@@ -85,6 +85,6 @@ class NodeWishEventBatchtifier(BaseBatchtifier, Generic[ES]):
                 )
             )
         )
-        
+
     def __len__(self) -> int:
         return self.max_len

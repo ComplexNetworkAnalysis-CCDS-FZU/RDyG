@@ -41,6 +41,6 @@ class GlobalEventBatchtifier(BaseBatchtifier, Generic[ES]):
             return self.intro
         else:
             return self.inner_iter[index - 1]
-        
+
     def __len__(self):
         return len(self.inner_iter)
