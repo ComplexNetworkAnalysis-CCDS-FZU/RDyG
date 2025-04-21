@@ -26,7 +26,7 @@ class MyketDataset(EventStream):
 
     def __next__(self) -> Event:
         if self.idx < self.max_idx:
-            _id, src_node, dst_node, timestamp, label, id = self.lines[self.idx].split(
+            src_node, dst_node, timestamp, label, id,_ = self.lines[self.idx].split(
                 ","
             )
 
@@ -49,7 +49,7 @@ class MyketDataset(EventStream):
 
 
 # TODO: 数据集加载为EventStream
-event_stream = MyketDataset("../DyGLib/processed_data/myket/ml_myket.csv")
+event_stream = MyketDataset("./datasets/myket/myket.csv")
 
 # 划分数据集
 train, test = SplitEventStream.spilt_event_stream_at(
