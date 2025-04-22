@@ -6,8 +6,6 @@ from DyGLib.utils.DataLoader import Data as DyGData
 from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
 from src.dataset.myket import MyketDataset
 from src.model.batch_emd_updater import BatchEmbeddingUpdater
-from src.payload.event import Event, EventKind
-from src.payload.event_stream import EventStream
 from src.utils.batchtifier import BatchedDataset
 from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier
 from src.utils.dataloader import Data, SplitEventStream
