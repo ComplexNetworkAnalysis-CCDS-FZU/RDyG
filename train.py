@@ -4,6 +4,7 @@ from tqdm import tqdm
 from DyGLib.models.DyGFormer import DyGFormer
 from DyGLib.utils.DataLoader import Data as DyGData
 from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
+from src.dataset.myket import MyketDataset
 from src.model.batch_emd_updater import BatchEmbeddingUpdater
 from src.payload.event import Event, EventKind
 from src.payload.event_stream import EventStream
@@ -12,51 +13,16 @@ from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier
 from src.utils.dataloader import Data, SplitEventStream
 from torch.utils.data import DataLoader
 
-# TODO： 解决模型初始化参数问题
-node_raw_features = np.zeros([694122, 2])
-edge_raw_features = np.zeros([17989, 172])
+
+dataset = MyketDataset()
+node_raw_features = np.zeros([(dataset.node_map().node_number()), 128])
+edge_raw_features = np.zeros([dataset.__len__(), 172])
 train_neighbor_sampler = None
 
 
-class MyketDataset(EventStream):
-    def __init__(self, path: str) -> None:
-        super().__init__()
-        with open(path, "r") as file:
-            self.lines = file.readlines()
-
-        self.idx = 1
-        self.max_idx = len(self.lines)
-
-    def __next__(self) -> Event:
-        if self.idx < self.max_idx:
-            src_node, dst_node, timestamp, label, id, _ = self.lines[self.idx].split(
-                ","
-            )
-
-            event = Event(
-                src_node=int(src_node),
-                dst_node=int(dst_node),
-                timestamp=float(timestamp),
-                event_id=int(id),
-                label=float(label),
-                ty=EventKind.ADD,
-            )
-
-            self.idx += 1
-            return event
-        else:
-            raise StopIteration
-
-    def __len__(self) -> int:
-        return self.max_idx - 1
-
-
-# TODO: 数据集加载为EventStream
-event_stream = MyketDataset("./datasets/myket/myket.csv")
-
 # 划分数据集
 train, test = SplitEventStream.spilt_event_stream_at(
-    event_stream, int(len(event_stream) * 0.9)
+    dataset.event_stream(), int(len(dataset) * 0.9)
 )
 
 train_batchtify = GlobalEventBatchtifier(train, 400)
@@ -85,7 +51,7 @@ model = DyGFormer(
     device="cpu",
 )
 
-r_part_model = BatchEmbeddingUpdater(2, 128)
+r_part_model = BatchEmbeddingUpdater(128, 128)
 
 
 for epoch in range(100):
