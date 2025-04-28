@@ -1,4 +1,4 @@
-from torch import cat, nn
+from torch import nn
 import torch
 
 DIM_ROW = 0

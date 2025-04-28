@@ -1,7 +1,5 @@
-from turtle import forward
 import numpy as np
 import torch
-from torch import nn
 import torch.utils
 import torch.utils.data
 from tqdm import tqdm
@@ -10,7 +8,6 @@ from DyGLib.models.modules import MergeLayer
 from DyGLib.utils.utils import NegativeEdgeSampler, get_neighbor_sampler
 from src.model.batch_emd_updater import BatchEmbeddingUpdater
 from src.payload.dataset import BaseDataset
-from src.utils.batchtifier import BaseBatchtifier, BatchedDataset
 from DyGLib.utils.DataLoader import Data as DyGData
 from src.utils.dataloader import Data
 
@@ -80,7 +77,7 @@ class LinkPredictionModel(torch.nn.Module):
                 batch_src_node_ids,
                 batch_dst_node_ids,
                 batch_node_interact_times,
-                batch_edge_ids,
+                _,
             ) = (
                 np.asarray(data.src_node_ids),
                 np.asarray(data.dst_node_ids),
@@ -128,13 +125,17 @@ class LinkPredictionModel(torch.nn.Module):
                 batch_neg_src_node_embedding,
                 batch_neg_dst_node_embedding,
             )
-        
+
         # 链路预测
         postiive_probabilities = (
-            self.link_predict.forward(src_embedding, dst_embedding).squeeze(dim=-1).sigmoid()
+            self.link_predict.forward(src_embedding, dst_embedding)
+            .squeeze(dim=-1)
+            .sigmoid()
         )
         negtive_probabilities = (
-            self.link_predict(neg_src_embedding, neg_dst_embedding).squeeze(dim=-1).sigmoid()
+            self.link_predict(neg_src_embedding, neg_dst_embedding)
+            .squeeze(dim=-1)
+            .sigmoid()
         )
-            
-        return postiive_probabilities,negtive_probabilities
+
+        return postiive_probabilities, negtive_probabilities
