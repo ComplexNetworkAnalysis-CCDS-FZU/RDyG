@@ -1,17 +1,27 @@
 import numpy as np
 import torch
+from torch import nn
 from tqdm import tqdm
 from DyGLib.models.DyGFormer import DyGFormer
+from DyGLib.models.modules import MLPClassifier, MergeLayer
 from DyGLib.utils.DataLoader import Data as DyGData
-from DyGLib.utils.utils import NeighborSampler, get_neighbor_sampler
+from DyGLib.utils.utils import (
+    NegativeEdgeSampler,
+    NeighborSampler,
+    get_neighbor_sampler,
+)
 from src.dataset.myket import MyketDataset
 from src.model.batch_emd_updater import BatchEmbeddingUpdater
+from src.model.link_predict_model import LinkPredictionModel
 from src.utils.batchtifier import BatchedDataset
 from src.utils.batchtifier.global_event_batch import GlobalEventBatchtifier
 from src.utils.dataloader import Data, SplitEventStream
 from torch.utils.data import DataLoader
+from torch import autograd
 
 
+# autograd.set_detect_anomaly(True)
+# 数据集准备
 dataset = MyketDataset()
 node_raw_features = np.zeros([(dataset.node_map().node_number()), 128])
 edge_raw_features = np.zeros([dataset.__len__(), 172])
@@ -35,73 +45,36 @@ test_dataloader = DataLoader(test_dataset)
 
 init_neighbor_sampler = NeighborSampler([])
 
-model = DyGFormer(
-    node_raw_features=node_raw_features,
-    edge_raw_features=edge_raw_features,
-    neighbor_sampler=init_neighbor_sampler,
-    time_feat_dim=100,
-    channel_embedding_dim=50,
-    patch_size=1,
-    num_layers=2,
-    num_heads=2,
-    dropout=0.1,
-    max_input_sequence_length=32,
-    device="cpu",
-)
+# 模型准备
+model = LinkPredictionModel(node_raw_features,edge_raw_features,init_neighbor_sampler)
 
-r_part_model = BatchEmbeddingUpdater(128, 128)
 
+
+# loss 与优化器
+loss_func = nn.BCELoss()
+optimizer = torch.optim.Adam(params=model.parameters(), lr=0.1, weight_decay=0.0)
+
+print(f"{dataset.node_map().node_number()}")
 
 for epoch in range(100):
-    embedding = torch.rand([14096, 128])
-    for data in tqdm(train_dataloader):
-        data = Data(
-            src_node_ids=list(data["src_node_ids"]),
-            dst_node_ids=list(data["dst_node_ids"]),
-            node_interactive_time=list(data["node_interactive_time"]),
-            edge_ids=list(data["edge_ids"]),
-            label=list(data["label"]),
-        )
-        data = DyGData(
-            data.src_node_ids,
-            data.dst_node_ids,
-            data.node_interactive_time,
-            data.edge_ids,
-            data.label,
-        )
-        model.train()
 
-        neighbor_sampler = get_neighbor_sampler(data, seed=12345)
-        model.set_neighbor_sampler(neighbor_sampler)
+        postiive_probabilities,negtive_probabilities = model.forward(dataset,train_dataloader)
 
-        (
-            batch_src_node_ids,
-            batch_dst_node_ids,
-            batch_node_interact_times,
-            batch_edge_ids,
-        ) = (
-            np.asarray(data.src_node_ids),
-            np.asarray(data.dst_node_ids),
-            np.asarray(data.node_interact_times),
-            np.asarray(data.edge_ids),
+        # 损失函数与梯度下降
+
+        predicts = torch.cat([postiive_probabilities, negtive_probabilities], dim=0)
+        labels = torch.cat(
+            [
+                torch.ones_like(postiive_probabilities),
+                torch.zeros_like(negtive_probabilities),
+            ],
+            dim=0,
         )
 
-        batch_src_node_embedding, batch_dsc_node_embedding = (
-            model.compute_src_dst_node_temporal_embeddings(
-                batch_src_node_ids, batch_dst_node_ids, batch_node_interact_times
-            )
-        )
+        loss = loss_func(input=predicts, target=labels)
 
-        embedding = r_part_model.forward(
-            torch.from_numpy(batch_src_node_ids),
-            torch.from_numpy(batch_dst_node_ids),
-            embedding,
-            batch_src_node_embedding,
-            batch_dsc_node_embedding,
-        )
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-        # TODO: 接入后续模型部分
-        print(embedding)
-        # TODO: 损失函数与梯度下降
-        break
-    break
+        print(f"Epoch: {epoch + 1}, train_loss: {loss.item()}")
